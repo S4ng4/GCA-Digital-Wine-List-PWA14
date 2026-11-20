@@ -301,8 +301,8 @@
     <!-- Mobile Side Menu -->
     <nav class="mobile-side-menu" id="mobileSideMenu">
         <div class="mobile-menu-header">
-            <button class="mobile-menu-close" id="mobileMenuClose">
-                <i class="fas fa-arrow-left"></i>
+            <button type="button" class="mobile-menu-close" id="mobileMenuClose">
+                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 <span>Close</span>
             </button>
             <h2 class="mobile-menu-title">Gran Caffe Experience</h2>
@@ -318,8 +318,8 @@
         <div class="mobile-menu-search-popup-content">
             <div class="mobile-menu-search-popup-header">
                 <h3 class="mobile-menu-search-popup-title">Search Wines</h3>
-                <button class="mobile-menu-search-popup-close" id="mobileMenuSearchPopupClose" aria-label="Close">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="mobile-menu-search-popup-close" id="mobileMenuSearchPopupClose" aria-label="Close">
+                    <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             <div class="mobile-menu-search-popup-body">
@@ -355,7 +355,7 @@
         <!-- Top Navigation -->
         <nav class="top-nav">
             <!-- Mobile Menu Button (visible on mobile only) -->
-            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
+            <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
                 <span class="burger-line"></span>
                 <span class="burger-line"></span>
                 <span class="burger-line"></span>
@@ -392,20 +392,23 @@
             </div>
             
             <!-- Mobile Search Button (visible on mobile only) -->
-            <button class="mobile-search-btn" id="mobileSearchBtn" aria-label="Search">
+            <button type="button" class="mobile-search-btn" id="mobileSearchBtn" aria-label="Search wines" aria-expanded="false" aria-controls="mobileSearchBarContainer">
                 <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
         </nav>
 
-        <!-- Mobile Search Bar (positioned below nav on mobile only) -->
-        <div class="mobile-search-bar-container" id="mobileSearchBarContainer">
+        <!-- Mobile Search Bar (toggled cleanly below nav via search icon) -->
+        <div class="mobile-search-bar-container" id="mobileSearchBarContainer" aria-hidden="true">
             <div class="mobile-search-wrapper">
                 <div class="mobile-search-input-wrapper">
-                    <i class="fas fa-search mobile-search-icon"></i>
-                    <input type="text" id="mobileSearchInput" name="search" class="mobile-search-input" placeholder=" " autocomplete="off">
+                    <svg class="gca-ico mobile-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="mobileSearchInput" name="search" class="mobile-search-input" placeholder=" " autocomplete="off" aria-label="Search wines">
                     <div class="mobile-search-placeholder" id="mobileSearchPlaceholder">
-                        Search wines by <span class="placeholder-name">Name</span>, <span class="placeholder-producer">Producer</span>, <span class="placeholder-varietal">Varietal</span>, or region...
+                        Search wine, <span class="placeholder-producer">producer</span>, <span class="placeholder-varietal">varietal</span>, or region...
                     </div>
+                    <button type="button" class="mobile-search-close-btn" id="mobileSearchCloseBtn" aria-label="Close search">
+                        <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                     <!-- Mobile Autocomplete Dropdown -->
                     <div class="search-autocomplete-dropdown mobile-autocomplete" id="mobileSearchAutocompleteDropdown" style="display: none;">
                         <div class="autocomplete-suggestions" id="mobileAutocompleteSuggestions"></div>
@@ -419,8 +422,8 @@
             <div class="mobile-wine-type-popup-overlay"></div>
             <div class="mobile-wine-type-popup-header">
                 <h3 class="mobile-wine-type-popup-title" id="mobileWineTypePopupTitle">Select Filter</h3>
-                <button class="mobile-wine-type-popup-close" id="mobileWineTypePopupClose" aria-label="Close">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="mobile-wine-type-popup-close" id="mobileWineTypePopupClose" aria-label="Close">
+                    <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             <div class="mobile-wine-type-popup-tabs">
@@ -449,23 +452,9 @@
                 <div class="mobile-map-view" id="mobileMapView">
                     <div class="mobile-map-wrapper" id="mobileMapWrapper">
                         <div id="mobileMap"></div>
-                        <!-- Body Filter Chips (shown when Dynamic Mode is active, overlay on map) -->
-                        <div class="mobile-body-filter-container" id="mobileBodyFilterContainer" style="display: none;">
-                            <div class="mobile-body-filter-chips">
-                                <button class="mobile-quick-search-btn mobile-body-filter-chip" data-body-mood="light-refreshing">
-                                    <span>Light &amp; Refreshing</span>
-                                </button>
-                                <button class="mobile-quick-search-btn mobile-body-filter-chip" data-body-mood="balanced">
-                                    <span>Balanced</span>
-                                </button>
-                                <button class="mobile-quick-search-btn mobile-body-filter-chip" data-body-mood="rich-powerful">
-                                    <span>Rich &amp; Powerful</span>
-                                </button>
-                            </div>
-                        </div>
                         <div class="mobile-region-info" id="mobileRegionInfo" style="display: none;">
-                            <button class="mobile-region-info-close" id="mobileRegionInfoClose" aria-label="Close region info">
-                                <i class="fas fa-times"></i>
+                            <button type="button" class="mobile-region-info-close" id="mobileRegionInfoClose" aria-label="Close region info">
+                                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                             <h3 id="mobileRegionName">Region Name</h3>
                             <p><strong>Capital:</strong> <span id="mobileRegionCapital">-</span></p>
@@ -474,34 +463,72 @@
                             <p id="mobileRegionFact" class="mobile-region-fact">-</p>
                             <p id="mobileRegionWineFacts" class="mobile-region-wine-facts">-</p>
                         </div>
-                        
                     </div>
-                    <!-- Quick Search Buttons (below map) -->
-                    <div class="mobile-quick-search-below-map">
-                        <div class="mobile-quick-search-buttons">
-                            <button class="mobile-quick-search-btn" id="mobileDynamicModeBtn">
-                                <span>Dynamic Mode</span>
+
+                    <!-- Structured Mobile Bottom Control Dock (below map) -->
+                    <div class="mobile-quick-search-below-map" id="mobileMapDock">
+                        <!-- Expandable Filter Drawer (Palate & Body + Curated Collections) -->
+                        <div class="mobile-filter-drawer" id="mobileFilterDrawer" aria-hidden="true">
+                            <div class="mobile-filter-drawer-handle" aria-hidden="true"></div>
+                            <div class="mobile-filter-section" id="mobileBodyFilterContainer">
+                                <div class="mobile-filter-section-label">Palate &amp; Body</div>
+                                <div class="mobile-body-filter-chips">
+                                    <button type="button" class="mobile-quick-search-btn mobile-body-filter-chip" data-body-mood="light-refreshing">
+                                        <span>Light &amp; Fresh</span>
+                                    </button>
+                                    <button type="button" class="mobile-quick-search-btn mobile-body-filter-chip" data-body-mood="balanced">
+                                        <span>Balanced</span>
+                                    </button>
+                                    <button type="button" class="mobile-quick-search-btn mobile-body-filter-chip" data-body-mood="rich-powerful">
+                                        <span>Rich &amp; Bold</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mobile-filter-section">
+                                <div class="mobile-filter-section-label">Curated Collections</div>
+                                <div class="mobile-curated-grid">
+                                    <button type="button" class="mobile-quick-search-btn mobile-curated-btn" id="mobileQuickSearchOrganic" data-filter="organic">
+                                        <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+                                        <span>Organic</span>
+                                    </button>
+                                    <button type="button" class="mobile-quick-search-btn mobile-curated-btn" id="mobileQuickSearchFancy" data-filter="fancy">
+                                        <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"></path></svg>
+                                        <span>Feeling Fancy</span>
+                                    </button>
+                                    <button type="button" class="mobile-quick-search-btn mobile-curated-btn" id="mobileQuickSearchVarietals" data-filter="varietals">
+                                        <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="2.2"></circle><circle cx="15" cy="9" r="2.2"></circle><circle cx="12" cy="13.8" r="2.2"></circle><circle cx="9.2" cy="18.2" r="1.9"></circle><circle cx="14.8" cy="18.2" r="1.9"></circle><path d="M12 6.8V3.5c0-1 1-1.5 2.5-1.5"></path></svg>
+                                        <span>Varietals</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 1: Single Horizontal Scrollable Wine Style Pill Rail -->
+                        <div class="mobile-quick-search-buttons mobile-wine-types-rail" id="mobileWineTypesRail" role="tablist" aria-label="Filter map by wine style">
+                            <button type="button" class="mobile-quick-search-btn mobile-wine-type-btn active" data-type="ALL" id="mobileWineTypeAll">
+                                <span class="gca-type-dot gca-dot-all" aria-hidden="true"></span>
+                                <span>All</span>
                             </button>
-                            <button type="button" class="mobile-quick-search-btn" id="mobileQuickSearchOrganic" data-filter="organic" style="display: none;" aria-hidden="true">
-                                <span>Organic</span>
+                            <!-- Wine type pills populated dynamically -->
+                        </div>
+
+                        <!-- Row 2: Balanced Primary Utility Bar -->
+                        <div class="mobile-dock-actions">
+                            <button type="button" class="mobile-dock-btn mobile-dock-btn--primary" id="mobileDynamicModeBtn" aria-expanded="false" aria-controls="mobileFilterDrawer">
+                                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                                <span>Filters &amp; Palate</span>
+                                <svg class="gca-ico mobile-dock-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
                             </button>
-                            <button type="button" class="mobile-quick-search-btn" id="mobileQuickSearchFancy" data-filter="fancy" style="display: none;" aria-hidden="true">
-                                <span>Feeling Fancy</span>
-                            </button>
-                            <button type="button" class="mobile-quick-search-btn" id="mobileQuickSearchVarietals" data-filter="varietals" style="display: none;" aria-hidden="true">
-                                <span>Varietals</span>
-                            </button>
-                            <button class="mobile-quick-search-btn compare-wines-btn" id="mobileCompareWinesBtn" onclick="window.location.href='wine-comparison.html'" style="display: none;">
-                                <i class="fas fa-balance-scale"></i>
-                                <span>Compare Wines</span>
+                            <button type="button" class="mobile-dock-btn mobile-dock-btn--secondary compare-wines-btn" id="mobileCompareWinesBtn" onclick="window.location.href='wine-comparison.html'">
+                                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"></line><path d="M5 7h14"></path><path d="M3 14l2-7 2 7a2 2 0 0 1-4 0z"></path><path d="M17 14l2-7 2 7a2 2 0 0 1-4 0z"></path></svg>
+                                <span>Compare</span>
                             </button>
                         </div>
                     </div>
-                    <!-- Mobile Wine Type Selector (positioned below map) -->
-                    <div class="mobile-wine-type-selector" id="mobileWineTypeSelector" style="display: none;">
-                        <div class="mobile-wine-types-scroll" id="mobileWineTypesScroll">
-                            <!-- Wine type chips will be populated dynamically -->
-                        </div>
+
+                    <!-- Legacy empty selector kept for JS compatibility, hidden via CSS -->
+                    <div class="mobile-wine-type-selector" id="mobileWineTypeSelector" style="display: none;" aria-hidden="true">
+                        <div class="mobile-wine-types-scroll" id="mobileWineTypesScroll"></div>
                     </div>
                 </div>
 
@@ -509,9 +536,9 @@
                 <div class="mobile-wines-cards-container" id="mobileWinesCardsContainer" style="display: none;">
                     <div class="mobile-wines-cards-header">
                         <div class="mobile-wines-cards-header-top">
-                            <button class="mobile-back-to-map-btn" id="mobileBackToMapBtn">
-                                <i class="fas fa-arrow-left"></i>
-                                <span>Back to Map</span>
+                            <button type="button" class="mobile-back-to-map-btn" id="mobileBackToMapBtn">
+                                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                <span>Map</span>
                             </button>
                             <h2 class="mobile-wines-cards-title" id="mobileWinesCardsTitle">Wines</h2>
                         </div>

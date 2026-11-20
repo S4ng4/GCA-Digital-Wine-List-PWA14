@@ -4817,13 +4817,20 @@ function initInteractiveMap() {
             const mobileWrapper = document.getElementById('mobileMapWrapper');
             const topNav = document.querySelector('.top-nav');
             const searchBar = document.getElementById('mobileSearchBarContainer');
-            if (topNav && searchBar && window.innerWidth < 1024) {
+            if (topNav && window.innerWidth < 1024) {
                 const navH = topNav.offsetHeight;
-                const searchH = window.getComputedStyle(searchBar).display !== 'none' ? searchBar.offsetHeight : 0;
+                const searchH = searchBar && searchBar.classList.contains('search-open') ? searchBar.offsetHeight : 0;
                 document.documentElement.style.setProperty('--mobile-nav-height', `${navH}px`);
                 document.documentElement.style.setProperty('--mobile-search-height', `${searchH}px`);
             }
             if (!mobileContainer || !mobileWrapper) {
+                return;
+            }
+            if (document.getElementById('mobileMapDock')) {
+                // Flex layout inside .mobile-map-view handles fluid map height cleanly
+                mobileWrapper.style.height = '';
+                mobileWrapper.style.minHeight = '';
+                mobileWrapper.style.maxHeight = '';
                 return;
             }
             const viewport = window.visualViewport;
@@ -5671,37 +5678,63 @@ function initInteractiveMap() {
         }
         // Load Mobile Wine Type Chips as Text Buttons in Quick Search Section
         function loadMobileWineTypeChips() {
-            const quickSearchButtons = document.querySelector('.mobile-quick-search-buttons');
+            const quickSearchButtons = document.getElementById('mobileWineTypesRail') || document.querySelector('.mobile-quick-search-buttons');
             if (!quickSearchButtons || !window.wineApp) return;
+            const isStructuredDock = !!document.getElementById('mobileMapDock');
+            const allBtn = document.getElementById('mobileWineTypeAll');
+
+            if (allBtn && !allBtn.dataset.bound) {
+                allBtn.dataset.bound = 'true';
+                allBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.mobile-wine-type-btn').forEach(b => b.classList.remove('active'));
+                    allBtn.classList.add('active');
+                    mobileCurrentWineType = null;
+                    if (typeof currentWineType !== 'undefined') {
+                        currentWineType = null;
+                    }
+                    updateMobileMapColors(null);
+                    closeMobileWineTypePopup();
+                });
+            }
+
             waitForWineApp(() => {
                 if (!window.wineApp || !window.wineApp.wines) return;
                 
                 const wineTypes = [
-                    { type: 'ROSSO', name: 'Red' },
-                    { type: 'BIANCO', name: 'White' },
-                    { type: 'ROSATO', name: 'Rosé' },
-                    { type: 'ARANCIONE', name: 'Orange' },
-                    { type: 'BOLLICINE', name: 'Sparkling' },
-                    { type: 'NON ALCOLICO', name: 'Non-Alc' }
+                    { type: 'ROSSO', name: 'Red', dotClass: 'gca-dot-red' },
+                    { type: 'BIANCO', name: 'White', dotClass: 'gca-dot-white' },
+                    { type: 'ROSATO', name: 'Rosé', dotClass: 'gca-dot-rose' },
+                    { type: 'ARANCIONE', name: 'Orange', dotClass: 'gca-dot-orange' },
+                    { type: 'BOLLICINE', name: 'Sparkling', dotClass: 'gca-dot-sparkling' },
+                    { type: 'NON ALCOLICO', name: 'Non-Alc', dotClass: 'gca-dot-nonalc' }
                 ];
                 
-                wineTypes.forEach(({ type, name }) => {
+                // Avoid duplicate buttons if called more than once
+                quickSearchButtons.querySelectorAll('.mobile-wine-type-btn:not(#mobileWineTypeAll)').forEach(el => el.remove());
+
+                wineTypes.forEach(({ type, name, dotClass }) => {
                     const count = window.wineApp.wines.filter(wine => 
                         window.wineApp.wineMatchesFamily(wine, type)
                     ).length;
                     if (count > 0) {
-                        // Create button with text only (no images)
                         const button = document.createElement('button');
+                        button.type = 'button';
                         button.className = 'mobile-quick-search-btn mobile-wine-type-btn';
                         button.dataset.type = type;
-                        button.innerHTML = `<span>${name}</span>`;
+                        button.setAttribute('role', 'tab');
+                        button.setAttribute('aria-selected', 'false');
+                        button.innerHTML = `<span class="gca-type-dot ${dotClass}" aria-hidden="true"></span><span>${name}</span>`;
                         
                         button.addEventListener('click', () => {
-                            // If clicking the same button, deselect it
+                            // If clicking the same button, deselect it and return to All
                             if (button.classList.contains('active')) {
                                 button.classList.remove('active');
+                                button.setAttribute('aria-selected', 'false');
+                                if (allBtn) {
+                                    allBtn.classList.add('active');
+                                    allBtn.setAttribute('aria-selected', 'true');
+                                }
                                 mobileCurrentWineType = null;
-                                // Keep desktop/tablet state in sync
                                 if (typeof currentWineType !== 'undefined') {
                                     currentWineType = null;
                                 }
@@ -5713,29 +5746,29 @@ function initInteractiveMap() {
                             // Remove active class from all wine type buttons
                             document.querySelectorAll('.mobile-wine-type-btn').forEach(b => {
                                 b.classList.remove('active');
+                                b.setAttribute('aria-selected', 'false');
                             });
                             button.classList.add('active');
+                            button.setAttribute('aria-selected', 'true');
                             mobileCurrentWineType = type;
-                            // Keep desktop/tablet state in sync (tablet uses regions panel)
                             if (typeof currentWineType !== 'undefined') {
                                 currentWineType = type;
                             }
                             updateMobileMapColors(type);
-                            // Popup is disabled on mobile/tablet (<=1023px), so use the regions panel flow there
-                            if (window.innerWidth <= 1023 && typeof showRegionsPanel === 'function') {
+                            if (window.innerWidth <= 1023 && window.innerWidth >= 768 && typeof showRegionsPanel === 'function') {
                                 showRegionsPanel(type);
-                            } else {
-                                // Desktop-only popup
+                            } else if (window.innerWidth > 1023) {
                                 openMobileWineTypePopup(type);
                             }
                         });
                         
-                        // Hide wine type buttons by default - show only when Dynamic Mode is active
-                        button.style.display = 'none';
+                        // Structured dock keeps wine style rail always visible; legacy layout hides until Dynamic Mode
+                        if (!isStructuredDock) {
+                            button.style.display = 'none';
+                        }
                         
-                        // Insert before the Compare Wines button if it exists, otherwise append
-                        const compareBtn = document.getElementById('mobileCompareWinesBtn');
-                        if (compareBtn) {
+                        const compareBtn = !isStructuredDock ? document.getElementById('mobileCompareWinesBtn') : null;
+                        if (compareBtn && compareBtn.parentNode === quickSearchButtons) {
                             quickSearchButtons.insertBefore(button, compareBtn);
                         } else {
                             quickSearchButtons.appendChild(button);
@@ -5747,6 +5780,10 @@ function initInteractiveMap() {
         
         // Function to toggle wine type buttons visibility based on Dynamic Mode
         function toggleWineTypeButtonsVisibility(isDynamicModeActive) {
+            if (document.getElementById('mobileMapDock')) {
+                // Structured dock keeps the wine type rail always visible and toggles #mobileFilterDrawer separately
+                return;
+            }
             const wineTypeButtons = document.querySelectorAll('.mobile-wine-type-btn');
             wineTypeButtons.forEach(btn => {
                 btn.style.display = isDynamicModeActive ? 'flex' : 'none';
@@ -6017,8 +6054,8 @@ function initInteractiveMap() {
                                 window.fallbackMobileItalyMap = window.GCAItalySvgMap.render('mobileMap', {
                                     wineType: mobileCurrentWineType || 'ALL',
                                     onSelectRegion: (regId) => {
-                                        if (typeof showMobileWinesCards === 'function') {
-                                            showMobileWinesCards(regId, mobileCurrentWineType || null);
+                                        if (typeof showMobileWinesForRegion === 'function') {
+                                            showMobileWinesForRegion(regId, mobileCurrentWineType || null);
                                         } else if (typeof showWinesListForRegion === 'function') {
                                             showWinesListForRegion(regId, mobileCurrentWineType || null);
                                         }
@@ -6258,8 +6295,8 @@ function initInteractiveMap() {
                                     window.fallbackMobileItalyMap = window.GCAItalySvgMap.render('mobileMap', {
                                         wineType: mobileCurrentWineType || 'ALL',
                                         onSelectRegion: (regId) => {
-                                            if (typeof showMobileWinesCards === 'function') {
-                                                showMobileWinesCards(regId, mobileCurrentWineType || null);
+                                            if (typeof showMobileWinesForRegion === 'function') {
+                                                showMobileWinesForRegion(regId, mobileCurrentWineType || null);
                                             } else if (typeof showWinesListForRegion === 'function') {
                                                 showWinesListForRegion(regId, mobileCurrentWineType || null);
                                             }
@@ -6560,6 +6597,9 @@ function initInteractiveMap() {
                         layer.options.interactive = false;
                     }
                 });
+            }
+            if (window.fallbackMobileItalyMap && typeof window.fallbackMobileItalyMap.updateWineType === 'function') {
+                window.fallbackMobileItalyMap.updateWineType(wineType || 'ALL');
             }
             // Update regions list to show dimmed regions
             updateRegionsListForWineType(wineType);
@@ -8406,10 +8446,57 @@ function initInteractiveMap() {
                 }
             }
         });
-        // Mobile search button is now hidden and disabled
-        // if (mobileSearchBtn) {
-        //     mobileSearchBtn.addEventListener('click', toggleMobileSearchBar);
-        // }
+        // Mobile header search toggle (cleanly opens/closes search drawer below top nav)
+        const mobileSearchBarEl = document.getElementById('mobileSearchBarContainer');
+        const mobileSearchCloseBtn = document.getElementById('mobileSearchCloseBtn');
+        const mobileSearchInputEl = document.getElementById('mobileSearchInput');
+        const setMobileSearchOpen = (open) => {
+            if (!mobileSearchBarEl) return;
+            mobileSearchBarEl.classList.toggle('search-open', open);
+            mobileSearchBarEl.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (mobileSearchBtn) {
+                mobileSearchBtn.classList.toggle('active', open);
+                mobileSearchBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+            if (open && mobileSearchInputEl) {
+                setTimeout(() => mobileSearchInputEl.focus(), 60);
+            } else if (!open) {
+                const dropdown = document.getElementById('mobileSearchAutocompleteDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        };
+        if (mobileSearchBtn && mobileSearchBarEl) {
+            mobileSearchBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isOpen = mobileSearchBarEl.classList.contains('search-open');
+                // Close filter drawer if open so overlays never stack awkwardly
+                const filterDrawer = document.getElementById('mobileFilterDrawer');
+                const dynBtn = document.getElementById('mobileDynamicModeBtn');
+                if (!isOpen && filterDrawer && filterDrawer.classList.contains('is-open')) {
+                    filterDrawer.classList.remove('is-open');
+                    filterDrawer.setAttribute('aria-hidden', 'true');
+                    if (dynBtn) {
+                        dynBtn.classList.remove('active');
+                        dynBtn.setAttribute('aria-expanded', 'false');
+                    }
+                }
+                setMobileSearchOpen(!isOpen);
+            });
+        }
+        if (mobileSearchCloseBtn) {
+            mobileSearchCloseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (mobileSearchInputEl && mobileSearchInputEl.value.trim() !== '') {
+                    mobileSearchInputEl.value = '';
+                    mobileSearchInputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    mobileSearchInputEl.focus();
+                } else {
+                    setMobileSearchOpen(false);
+                }
+            });
+        }
         
         // Mobile search is now handled by setupSearchInput function above
         if (mobileBackToCategories) {
@@ -10791,16 +10878,54 @@ function initInteractiveMap() {
         // Expose showWinesListForRegion as global function so it can be called from loadRegionsForWineType
         window.showWinesListForRegion = showWinesListForRegion;
         
-        // Setup Dynamic Mode Button
-        // Note: Map transformations are now always active, this button only toggles wine type cards and search bar
+        // Setup Filter Drawer Toggle (#mobileDynamicModeBtn)
         const dynamicModeBtn = document.getElementById('mobileDynamicModeBtn');
+        const filterDrawer = document.getElementById('mobileFilterDrawer');
         const wineTypeSelector = document.getElementById('mobileWineTypeSelector');
         const searchBarContainer = document.getElementById('mobileSearchBarContainer');
         const searchInputWrapper = document.querySelector('.mobile-search-input-wrapper');
         const bodyFilterContainer = document.getElementById('mobileBodyFilterContainer');
-        
-        if (dynamicModeBtn && wineTypeSelector && searchBarContainer) {
-            // Ensure it starts hidden
+
+        const setFilterDrawerOpen = (open) => {
+            if (!filterDrawer) return;
+            filterDrawer.classList.toggle('is-open', open);
+            filterDrawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (dynamicModeBtn) {
+                dynamicModeBtn.classList.toggle('active', open);
+                dynamicModeBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+            if (open && searchBarContainer && searchBarContainer.classList.contains('search-open')) {
+                searchBarContainer.classList.remove('search-open');
+                searchBarContainer.setAttribute('aria-hidden', 'true');
+                const sBtn = document.getElementById('mobileSearchBtn');
+                if (sBtn) {
+                    sBtn.classList.remove('active');
+                    sBtn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        };
+
+        if (dynamicModeBtn && filterDrawer) {
+            setFilterDrawerOpen(false);
+
+            dynamicModeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const isOpen = filterDrawer.classList.contains('is-open');
+                setFilterDrawerOpen(!isOpen);
+            });
+
+            // Close filter drawer when tapping on the map area outside the dock
+            const mobileMapWrapperEl = document.getElementById('mobileMapWrapper');
+            if (mobileMapWrapperEl) {
+                mobileMapWrapperEl.addEventListener('click', () => {
+                    if (filterDrawer.classList.contains('is-open')) {
+                        setFilterDrawerOpen(false);
+                    }
+                });
+            }
+        } else if (dynamicModeBtn && wineTypeSelector && searchBarContainer) {
+            // Legacy fallback for pages without #mobileFilterDrawer
             wineTypeSelector.style.display = 'none';
             if (searchInputWrapper) {
                 searchInputWrapper.style.display = 'none';
@@ -10813,14 +10938,12 @@ function initInteractiveMap() {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Check current state - check inline style first, then computed style
                 const inlineDisplay = wineTypeSelector.style.display;
                 const computedDisplay = window.getComputedStyle(wineTypeSelector).display;
                 const currentDisplay = inlineDisplay || computedDisplay;
                 const isVisible = currentDisplay !== 'none';
                 
                 if (isVisible) {
-                    // Hide wine type selector, search input, and body filter chips
                     wineTypeSelector.style.display = 'none';
                     if (searchInputWrapper) {
                         searchInputWrapper.style.display = 'none';
@@ -10833,10 +10956,8 @@ function initInteractiveMap() {
                     }
                     searchBarContainer.classList.remove('dynamic-mode-active');
                     this.classList.remove('active');
-                    // Hide wine type buttons
                     toggleWineTypeButtonsVisibility(false);
                 } else {
-                    // Show wine type selector, search input, and body filter chips
                     wineTypeSelector.style.display = 'flex';
                     if (searchInputWrapper) {
                         searchInputWrapper.style.display = 'block';
@@ -10846,15 +10967,8 @@ function initInteractiveMap() {
                     }
                     searchBarContainer.classList.add('dynamic-mode-active');
                     this.classList.add('active');
-                    // Show wine type buttons
                     toggleWineTypeButtonsVisibility(true);
                 }
-            });
-        } else {
-            console.warn('Dynamic Mode Button, Wine Type Selector or Search Bar Container not found:', {
-                dynamicModeBtn: !!dynamicModeBtn,
-                wineTypeSelector: !!wineTypeSelector,
-                searchBarContainer: !!searchBarContainer
             });
         }
         
@@ -10863,7 +10977,6 @@ function initInteractiveMap() {
         const mobileSearchPlaceholder = document.getElementById('mobileSearchPlaceholder');
         
         if (mobileSearchInput && mobileSearchPlaceholder) {
-            // Hide/show placeholder based on input value
             function updatePlaceholder() {
                 if (mobileSearchInput.value.trim() === '') {
                     mobileSearchPlaceholder.style.display = 'block';
@@ -10876,35 +10989,35 @@ function initInteractiveMap() {
             mobileSearchInput.addEventListener('focus', updatePlaceholder);
             mobileSearchInput.addEventListener('blur', updatePlaceholder);
             
-            // Initial check
             updatePlaceholder();
         }
         
-        // Setup Quick Search Buttons
+        // Setup Quick Search Buttons (Curated Collections)
         const organicBtn = document.getElementById('mobileQuickSearchOrganic');
         const fancyBtn = document.getElementById('mobileQuickSearchFancy');
         const varietalsBtn = document.getElementById('mobileQuickSearchVarietals');
         const bodyFilterChips = document.querySelectorAll('.mobile-body-filter-chip');
+        const clearCuratedActive = () => {
+            document.querySelectorAll('.mobile-curated-btn, #mobileQuickSearchOrganic, #mobileQuickSearchFancy, #mobileQuickSearchVarietals').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        };
         
         if (organicBtn) {
             organicBtn.addEventListener('click', function() {
-                // Toggle active state
                 const isActive = this.classList.contains('active');
-                document.querySelectorAll('.mobile-quick-search-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                clearCuratedActive();
                 
                 if (!isActive) {
                     this.classList.add('active');
+                    setFilterDrawerOpen(false);
                     showMobileWinesForQuickSearch('organic');
                 } else {
-                    // If already active, go back to map
                     const mapView = document.getElementById('mobileMapView');
                     const winesContainer = document.getElementById('mobileWinesCardsContainer');
                     if (mapView && winesContainer) {
                         mapView.style.display = 'flex';
                         winesContainer.style.display = 'none';
-                        // Remove organic description when going back
                         const winesHeader = document.querySelector('.mobile-wines-cards-header');
                         const existingDescription = winesHeader?.querySelector('.mobile-wines-cards-organic-description');
                         if (existingDescription) {
@@ -10918,17 +11031,14 @@ function initInteractiveMap() {
         
         if (fancyBtn) {
             fancyBtn.addEventListener('click', function() {
-                // Toggle active state
                 const isActive = this.classList.contains('active');
-                document.querySelectorAll('.mobile-quick-search-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                clearCuratedActive();
                 
                 if (!isActive) {
                     this.classList.add('active');
+                    setFilterDrawerOpen(false);
                     showMobileWinesForQuickSearch('fancy');
                 } else {
-                    // If already active, go back to map
                     const mapView = document.getElementById('mobileMapView');
                     const winesContainer = document.getElementById('mobileWinesCardsContainer');
                     if (mapView && winesContainer) {
@@ -10945,17 +11055,14 @@ function initInteractiveMap() {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Toggle active state
                 const isActive = this.classList.contains('active');
-                document.querySelectorAll('.mobile-quick-search-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                clearCuratedActive();
                 
                 if (!isActive) {
                     this.classList.add('active');
+                    setFilterDrawerOpen(false);
                     showMobileVarietalsList();
                 } else {
-                    // If already active, go back to map
                     const mapView = document.getElementById('mobileMapView');
                     const winesContainer = document.getElementById('mobileWinesCardsContainer');
                     if (mapView && winesContainer) {
@@ -10973,14 +11080,13 @@ function initInteractiveMap() {
                     const isActive = this.classList.contains('active');
                     const moodKey = this.dataset.bodyMood;
 
-                    // Reset all chips first
                     bodyFilterChips.forEach(c => c.classList.remove('active'));
 
                     if (!isActive && moodKey) {
                         this.classList.add('active');
+                        setFilterDrawerOpen(false);
                         showMobileWinesForBody(moodKey);
                     } else {
-                        // If chip was active, go back to map
                         const mapView = document.getElementById('mobileMapView');
                         const winesContainer = document.getElementById('mobileWinesCardsContainer');
                         if (mapView && winesContainer) {
