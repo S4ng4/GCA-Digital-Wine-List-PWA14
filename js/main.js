@@ -1096,12 +1096,9 @@ class WineListApp {
                 mobileBadgesEl.innerHTML = badges.join('');
             }
             if (mobileSublineEl) {
-                const parts = [];
-                if (wine.wine_producer) parts.push(wine.wine_producer);
-                if (wine.region) parts.push(wine.region);
-                if (vintageYear) parts.push(vintageYear);
-                mobileSublineEl.textContent = parts.join(' · ');
-                mobileSublineEl.style.display = parts.length ? '' : 'none';
+                const producerText = wine.wine_producer ? String(wine.wine_producer).trim() : '';
+                mobileSublineEl.textContent = producerText;
+                mobileSublineEl.style.display = producerText ? '' : 'none';
             }
         }
 
