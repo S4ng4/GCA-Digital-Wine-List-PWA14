@@ -2645,22 +2645,630 @@
             border-top: 1px solid rgba(212, 175, 55, 0.16) !important;
             padding: 1.5rem 1rem !important;
         }
+
+        /* Mobile-only elements hidden on desktop & tablet */
+        .wd-mobile-only,
+        .wd-mobile-action-bar {
+            display: none;
+        }
+
+        /* ==========================================================================
+           Mobile Single-Screen Sommelier Dossier (<= 767px)
+           Fits bottle, identity, price, provenance, tasting notes, and actions
+           inside one clean 100dvh viewport with zero whole-page scrolling.
+           ========================================================================== */
+        @media (max-width: 767px) {
+            html, body {
+                height: 100%;
+                height: 100dvh;
+                overflow: hidden !important;
+                overscroll-behavior: none;
+            }
+
+            .luxury-container {
+                height: 100vh !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                min-height: 0 !important;
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background: radial-gradient(ellipse at top, #171310 0%, #0B0A09 55%, #080706 100%) !important;
+            }
+
+            /* 1. Unified Single-Row Top Bar (replaces stacked double header) */
+            .wine-details-top-bar {
+                position: relative !important;
+                display: grid !important;
+                grid-template-columns: auto minmax(0, 1fr) auto !important;
+                align-items: center !important;
+                gap: 0.5rem !important;
+                min-height: 52px !important;
+                padding: calc(0.4rem + env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px)) 0.4rem max(0.75rem, env(safe-area-inset-left, 0px)) !important;
+                background: linear-gradient(180deg, rgba(18, 15, 13, 0.98) 0%, rgba(11, 10, 9, 0.95) 100%) !important;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.22) !important;
+                flex-shrink: 0 !important;
+            }
+
+            .wine-details-back-bar,
+            .luxury-footer {
+                display: none !important;
+            }
+
+            .wd-mobile-only {
+                display: inline-flex;
+            }
+
+            .wd-top-icon-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                min-height: 38px !important;
+                padding: 0 !important;
+                border-radius: 10px !important;
+                background: rgba(28, 25, 22, 0.9) !important;
+                border: 1px solid rgba(212, 175, 55, 0.28) !important;
+                color: var(--gca-gold) !important;
+                text-decoration: none !important;
+                cursor: pointer !important;
+                transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease !important;
+            }
+
+            .wd-top-icon-btn:active {
+                transform: scale(0.95) !important;
+                background: rgba(212, 175, 55, 0.16) !important;
+            }
+
+            .wd-top-icon-btn svg {
+                width: 17px !important;
+                height: 17px !important;
+                stroke: currentColor !important;
+                fill: none !important;
+                stroke-width: 1.9 !important;
+                stroke-linecap: round !important;
+                stroke-linejoin: round !important;
+            }
+
+            .wd-top-actions-right {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 0.4rem !important;
+            }
+
+            .wine-details-brand {
+                align-items: center !important;
+                min-width: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .wine-details-brand-title {
+                font-size: clamp(0.76rem, 3.4vw, 0.9rem) !important;
+                letter-spacing: 0.1em !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+            }
+
+            .wine-details-brand-subtitle {
+                font-family: var(--gca-font-ui) !important;
+                font-size: 0.56rem !important;
+                letter-spacing: 0.18em !important;
+                text-transform: uppercase !important;
+                color: var(--gca-muted) !important;
+            }
+
+            /* 2. Main Single-Screen Body Container */
+            .wine-details-container {
+                flex: 1 1 0% !important;
+                min-height: 0 !important;
+                overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+                padding: 0.6rem max(0.75rem, env(safe-area-inset-right, 0px)) 0.55rem max(0.75rem, env(safe-area-inset-left, 0px)) !important;
+                background: transparent !important;
+            }
+
+            .wine-details-content {
+                flex: 1 1 0% !important;
+                min-height: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                padding: 0 !important;
+                gap: 0 !important;
+                background: transparent !important;
+                overflow: hidden !important;
+            }
+
+            /* Grid: Bottle Left + Identity/Description Right, Provenance & Tasting below */
+            .wine-details-left.wine-info-section {
+                flex: 1 1 0% !important;
+                min-height: 0 !important;
+                height: 100% !important;
+                display: grid !important;
+                grid-template-columns: 92px minmax(0, 1fr) !important;
+                grid-template-rows: auto auto minmax(0, 1fr) !important;
+                grid-template-areas:
+                    "bottle header"
+                    "bottle description"
+                    "tasting tasting" !important;
+                gap: 0.45rem 0.75rem !important;
+                align-items: stretch !important;
+                overflow: hidden !important;
+            }
+
+            /* 3. Compact Jewel-Box Bottle Pedestal (Left of Hero) */
+            .wine-image-section {
+                grid-area: bottle !important;
+                height: 100% !important;
+                min-height: 128px !important;
+                max-height: 158px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                align-self: stretch !important;
+            }
+
+            .wine-details-content .wine-image,
+            .wine-image {
+                width: 92px !important;
+                height: 100% !important;
+                min-height: 128px !important;
+                max-height: 158px !important;
+                margin: 0 !important;
+                padding: 0.45rem 0.35rem !important;
+                border-radius: 14px !important;
+                border: 1px solid rgba(212, 175, 55, 0.28) !important;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45) !important;
+            }
+
+            .wine-details-content #wineBottleImage,
+            #wineBottleImage {
+                max-height: 140px !important;
+                max-width: 80px !important;
+                width: auto !important;
+                height: auto !important;
+            }
+
+            .gca-bottle-svg {
+                width: 44px !important;
+                height: 104px !important;
+            }
+
+            .gca-bottle-caption {
+                display: none !important;
+            }
+
+            /* 4. Hero Identity, Badges, Prominent Gold Price & Subline (Top Right) */
+            .wine-name-block {
+                grid-area: header !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important;
+                gap: 0.25rem !important;
+                padding: 0 !important;
+                border-bottom: none !important;
+                min-width: 0 !important;
+            }
+
+            .wd-hero-top-row {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 0.4rem !important;
+                width: 100% !important;
+            }
+
+            .wd-hero-badges {
+                display: flex !important;
+                align-items: center !important;
+                flex-wrap: wrap !important;
+                gap: 0.3rem !important;
+                min-width: 0 !important;
+            }
+
+            .wd-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.14rem 0.48rem;
+                border-radius: 999px;
+                font-family: var(--gca-font-ui);
+                font-size: 0.62rem;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                line-height: 1.25;
+                white-space: nowrap;
+            }
+
+            .wd-badge--type {
+                background: rgba(212, 175, 55, 0.16);
+                border: 1px solid rgba(212, 175, 55, 0.38);
+                color: var(--gca-gold-soft);
+            }
+
+            .wd-badge--type[data-family="ROSSO"] {
+                background: rgba(158, 42, 59, 0.26);
+                border-color: rgba(201, 75, 92, 0.55);
+                color: #F3B3BC;
+            }
+
+            .wd-badge--denom {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(245, 240, 230, 0.2);
+                color: var(--gca-ivory);
+            }
+
+            .wd-badge--organic {
+                background: rgba(91, 140, 103, 0.2);
+                border: 1px solid rgba(110, 174, 126, 0.45);
+                color: #A6D9B2;
+            }
+
+            .wd-hero-price {
+                font-family: var(--gca-font-display) !important;
+                font-size: 1.22rem !important;
+                font-weight: 700 !important;
+                color: var(--gca-gold) !important;
+                letter-spacing: 0.03em !important;
+                line-height: 1 !important;
+                flex-shrink: 0 !important;
+            }
+
+            .wine-name {
+                font-size: clamp(1.06rem, 4.5vw, 1.32rem) !important;
+                line-height: 1.16 !important;
+                letter-spacing: 0.04em !important;
+                margin: 0 !important;
+                color: var(--gca-ivory) !important;
+                display: -webkit-box !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+            }
+
+            .wd-hero-subline {
+                display: block !important;
+                font-family: var(--gca-font-ui) !important;
+                font-size: 0.72rem !important;
+                font-weight: 500 !important;
+                letter-spacing: 0.04em !important;
+                color: var(--gca-muted) !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            .wine-format-line {
+                display: none !important;
+            }
+
+            /* 5. Compact Editorial Sommelier Note (Right below Title, next to Bottle) */
+            .detail-section-desc {
+                grid-area: description !important;
+                background: transparent !important;
+                border: none !important;
+                border-left: 2px solid rgba(212, 175, 55, 0.55) !important;
+                border-radius: 0 !important;
+                padding: 0.1rem 0 0.1rem 0.6rem !important;
+                margin: 0 !important;
+                align-self: start !important;
+            }
+
+            .detail-section-desc .detail-section-title {
+                display: none !important;
+            }
+
+            .detail-section-desc .wine-description {
+                font-family: var(--gca-font-editorial) !important;
+                font-style: italic !important;
+                font-size: 0.94rem !important;
+                line-height: 1.32 !important;
+                color: rgba(245, 240, 230, 0.88) !important;
+                display: -webkit-box !important;
+                -webkit-line-clamp: 4 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+            }
+
+            .detail-section-desc .wine-description p {
+                margin: 0 !important;
+            }
+
+            /* 6. Combined Provenance & Tasting Profile Panel (Cleanly bounded inside single screen) */
+            .detail-section-tasting {
+                grid-area: tasting !important;
+                display: flex !important;
+                flex-direction: column !important;
+                min-height: 0 !important;
+                max-height: 100% !important;
+                align-self: start !important;
+                overflow: hidden !important;
+                padding: 0.8rem 0.85rem !important;
+                border-radius: 14px !important;
+                margin-top: 0.2rem !important;
+                gap: 0.65rem !important;
+            }
+
+            .detail-section-tasting .detail-section-title {
+                font-size: 0.68rem !important;
+                letter-spacing: 0.18em !important;
+                margin: 0 !important;
+                padding-bottom: 0.45rem !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Self-balancing Flex Specs Grid (auto-expands partial rows cleanly with zero gaps) */
+            .wine-meta {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                gap: 0.4rem !important;
+                margin: 0 !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Hide Price & Denomination in grid since they sit prominently in Hero */
+            .wine-meta .meta-item[data-meta-key="price"],
+            .wine-meta .meta-item[data-meta-key="denomination"] {
+                display: none !important;
+            }
+
+            .wine-meta .meta-item {
+                flex: 1 1 calc(33.333% - 0.4rem) !important;
+                width: auto !important;
+                max-width: none !important;
+                min-width: 84px !important;
+                padding: 0.4rem 0.52rem !important;
+                border-radius: 9px !important;
+                gap: 0.14rem !important;
+                background: rgba(11, 10, 9, 0.78) !important;
+                border: 1px solid rgba(212, 175, 55, 0.16) !important;
+            }
+
+            .wine-meta .meta-item[data-meta-key="producer"],
+            .wine-meta .meta-item[data-meta-key="region"] {
+                flex: 1 1 calc(50% - 0.4rem) !important;
+                width: auto !important;
+            }
+
+            .wine-meta .meta-item[data-meta-key="grape"] {
+                flex: 1 0 100% !important;
+                width: 100% !important;
+            }
+
+            .wine-meta .meta-label {
+                font-size: 0.56rem !important;
+                letter-spacing: 0.12em !important;
+                color: var(--gca-gold) !important;
+                line-height: 1.1 !important;
+            }
+
+            .wine-meta .meta-value {
+                font-family: var(--gca-font-ui) !important;
+                font-size: 0.8rem !important;
+                font-weight: 500 !important;
+                line-height: 1.24 !important;
+                color: var(--gca-ivory) !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                width: 100% !important;
+            }
+
+            .wine-meta .meta-item[data-meta-key="grape"] .meta-value {
+                white-space: normal !important;
+                display: -webkit-box !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+            }
+
+            /* Tasting Notes (Visual / Olfactory / Gustatory) — Clean compact rows */
+            .wine-tasting-notes-inline {
+                flex: 0 1 auto !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                margin: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.48rem !important;
+                padding-right: 0.1rem !important;
+                scrollbar-width: thin !important;
+            }
+
+            /* Avoid duplicating Body inside tasting notes on mobile (already in Specs Grid) */
+            .wine-tasting-notes-inline .tasting-category[data-tasting-key="body"] {
+                display: none !important;
+            }
+
+            .wine-tasting-notes-inline .tasting-category {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.16rem !important;
+                padding: 0.52rem 0.68rem !important;
+                margin: 0 !important;
+                border-radius: 10px !important;
+                background: rgba(11, 10, 9, 0.58) !important;
+                border: 1px solid rgba(212, 175, 55, 0.14) !important;
+                border-left: 2.5px solid rgba(212, 175, 55, 0.55) !important;
+            }
+
+            .wine-tasting-notes-inline .tasting-label {
+                font-family: var(--gca-font-ui) !important;
+                font-size: 0.58rem !important;
+                font-weight: 600 !important;
+                letter-spacing: 0.14em !important;
+                text-transform: uppercase !important;
+                color: var(--gca-gold-soft) !important;
+                margin: 0 !important;
+                min-width: 0 !important;
+            }
+
+            .wine-tasting-notes-inline .tasting-value {
+                font-family: var(--gca-font-ui) !important;
+                font-size: 0.81rem !important;
+                line-height: 1.35 !important;
+                color: rgba(245, 240, 230, 0.92) !important;
+                text-align: left !important;
+            }
+
+            /* 7. Bottom Thumb Action Dock */
+            .wd-mobile-action-bar {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) auto !important;
+                gap: 0.5rem !important;
+                flex-shrink: 0 !important;
+                padding: 0.5rem max(0.75rem, env(safe-area-inset-right, 0px)) calc(0.55rem + env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px)) !important;
+                background: linear-gradient(180deg, rgba(18, 16, 13, 0.98) 0%, rgba(11, 10, 9, 1) 100%) !important;
+                border-top: 1px solid rgba(212, 175, 55, 0.22) !important;
+                box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5) !important;
+            }
+
+            .wd-action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.45rem;
+                min-height: 42px;
+                padding: 0 1rem;
+                border-radius: 12px;
+                font-family: var(--gca-font-ui);
+                font-size: 0.8rem;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-decoration: none;
+                cursor: pointer;
+                white-space: nowrap;
+                transition: transform 0.15s ease, background-color 0.18s ease, border-color 0.18s ease;
+            }
+
+            .wd-action-btn:active {
+                transform: scale(0.97);
+            }
+
+            .wd-action-btn--primary {
+                background: linear-gradient(145deg, rgba(36, 30, 22, 0.96), rgba(22, 19, 15, 0.98));
+                border: 1px solid rgba(212, 175, 55, 0.42);
+                color: var(--gca-gold-soft);
+            }
+
+            .wd-action-btn--secondary {
+                background: rgba(26, 23, 20, 0.92);
+                border: 1px solid rgba(212, 175, 55, 0.24);
+                color: var(--gca-ivory);
+                padding: 0 0.95rem;
+            }
+
+            .wd-action-btn .gca-ico {
+                width: 15px;
+                height: 15px;
+            }
+
+            /* Extra-compact phones (e.g. iPhone SE 375x667) */
+            @media (max-height: 700px) {
+                .wine-details-top-bar {
+                    min-height: 46px !important;
+                    padding-top: calc(0.3rem + env(safe-area-inset-top, 0px)) !important;
+                    padding-bottom: 0.3rem !important;
+                }
+                .wd-top-icon-btn {
+                    width: 34px !important;
+                    height: 34px !important;
+                    min-width: 34px !important;
+                    min-height: 34px !important;
+                }
+                .wine-details-container {
+                    padding: 0.45rem 0.65rem 0.4rem !important;
+                }
+                .wine-details-left.wine-info-section {
+                    grid-template-columns: 78px minmax(0, 1fr) !important;
+                    gap: 0.32rem 0.6rem !important;
+                }
+                .wine-image-section,
+                .wine-details-content .wine-image,
+                .wine-image {
+                    width: 78px !important;
+                    min-height: 108px !important;
+                    max-height: 126px !important;
+                }
+                .wine-details-content #wineBottleImage,
+                #wineBottleImage {
+                    max-height: 112px !important;
+                    max-width: 66px !important;
+                }
+                .gca-bottle-svg {
+                    width: 36px !important;
+                    height: 86px !important;
+                }
+                .wine-name {
+                    font-size: 1.02rem !important;
+                }
+                .wd-hero-price {
+                    font-size: 1.08rem !important;
+                }
+                .detail-section-desc .wine-description {
+                    font-size: 0.84rem !important;
+                    -webkit-line-clamp: 2 !important;
+                }
+                .detail-section-tasting {
+                    padding: 0.5rem 0.6rem !important;
+                    gap: 0.4rem !important;
+                }
+                .wine-meta {
+                    gap: 0.3rem !important;
+                }
+                .wine-meta .meta-item {
+                    padding: 0.28rem 0.42rem !important;
+                }
+                .wine-meta .meta-value {
+                    font-size: 0.74rem !important;
+                }
+                .wine-tasting-notes-inline {
+                    gap: 0.28rem !important;
+                }
+                .wine-tasting-notes-inline .tasting-category {
+                    padding: 0.32rem 0.5rem !important;
+                }
+                .wine-tasting-notes-inline .tasting-value {
+                    font-size: 0.74rem !important;
+                    line-height: 1.26 !important;
+                }
+                .wd-mobile-action-bar {
+                    padding: 0.4rem 0.65rem calc(0.45rem + env(safe-area-inset-bottom, 0px)) !important;
+                }
+                .wd-action-btn {
+                    min-height: 38px !important;
+                    font-size: 0.76rem !important;
+                }
+            }
+        }
     </style>
 </head>
 <body class="hero-enhanced">
     <div class="luxury-container">
-        <!-- Top Bar: brand | home -->
+        <!-- Top Bar: [mobile back] | brand | [mobile share] + home -->
         <div class="wine-details-top-bar">
+            <a href="./wine-map.html" class="wd-mobile-only wd-top-icon-btn" id="mobileTopBackBtn" aria-label="Back to Wine Atlas" title="Back to Wine Atlas">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </a>
             <div class="wine-details-brand">
                 <span class="wine-details-brand-title">GRAN CAFFÈ L'AQUILA</span>
                 <span class="wine-details-brand-subtitle">Fine Wine Collection</span>
             </div>
-            <a href="./index.html" class="wine-details-home-btn" aria-label="Back to Home" title="Back to Home">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h4.5v-6h3v6H18a1 1 0 0 0 1-1V9.5"></path></svg>
-            </a>
+            <div class="wd-top-actions-right">
+                <button type="button" class="wd-mobile-only wd-top-icon-btn" id="shareWineBtnTop" aria-label="Share this wine" title="Share this wine">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                </button>
+                <a href="./index.html" class="wine-details-home-btn wd-top-icon-btn" aria-label="Back to Home" title="Back to Home">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h4.5v-6h3v6H18a1 1 0 0 0 1-1V9.5"></path></svg>
+                </a>
+            </div>
         </div>
 
-        <!-- Back to map bar -->
+        <!-- Back to map bar (desktop & tablet) -->
         <div class="wine-details-back-bar">
             <a href="./wine-map.html" class="wine-details-back-btn" id="backButton">
                 <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -2674,7 +3282,13 @@
                 <!-- Editorial Sommelier Dossier -->
                 <div class="wine-details-left wine-info-section">
                     <div class="wine-name-block">
+                        <!-- Mobile-only compact badges & prominent price -->
+                        <div class="wd-mobile-only wd-hero-top-row" id="mobileHeroTopRow">
+                            <div class="wd-hero-badges" id="mobileHeroBadges"></div>
+                            <span class="wd-hero-price" id="mobileHeroPrice"></span>
+                        </div>
                         <h1 class="wine-name" id="wineName">Loading...</h1>
+                        <div class="wd-mobile-only wd-hero-subline" id="mobileHeroSubline"></div>
                         <div id="wineFormatLine" class="wine-format-line" aria-live="polite"></div>
                     </div>
                     <!-- Bottle image / silhouette pedestal -->
@@ -2713,6 +3327,18 @@
                 </div>
             </div>
         </main>
+
+        <!-- Mobile Single-Screen Bottom Action Dock -->
+        <nav class="wd-mobile-action-bar" aria-label="Wine detail actions">
+            <a href="./wine-map.html" class="wd-action-btn wd-action-btn--primary" id="mobileBottomBackBtn">
+                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Back to Wine Atlas</span>
+            </a>
+            <a href="./wine-comparison.html" class="wd-action-btn wd-action-btn--secondary">
+                <svg class="gca-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"></line><path d="M5 7h14"></path><path d="M3 14l2-7 2 7a2 2 0 0 1-4 0z"></path><path d="M17 14l2-7 2 7a2 2 0 0 1-4 0z"></path></svg>
+                <span>Compare</span>
+            </a>
+        </nav>
 
         <!-- Tasting Notes Popup -->
         <div class="tasting-notes-popup-overlay" id="tastingNotesPopup" role="dialog" aria-modal="true" aria-labelledby="tastingNotesPopupTitle" aria-hidden="true">
@@ -2888,8 +3514,18 @@
                 shareUrl.value = window.location.href;
             }
 
-            // Back Button handler - set href if not already set by WineApp
+            // Back Button handler - set href if not already set by WineApp and sync mobile back buttons
             const backButton = document.getElementById('backButton');
+            const mobileTopBackBtn = document.getElementById('mobileTopBackBtn');
+            const mobileBottomBackBtn = document.getElementById('mobileBottomBackBtn');
+            const syncMobileBackHref = () => {
+                if (!backButton) return;
+                const href = backButton.getAttribute('href');
+                if (href && href !== '#') {
+                    if (mobileTopBackBtn) mobileTopBackBtn.setAttribute('href', href);
+                    if (mobileBottomBackBtn) mobileBottomBackBtn.setAttribute('href', href);
+                }
+            };
             if (backButton) {
                 // Wait for WineApp to set the href, or set it ourselves if not set
                 const checkBackButton = () => {
@@ -2926,11 +3562,13 @@
                         
                         backButton.href = backUrl;
                     }
+                    syncMobileBackHref();
                 };
                 
                 // Check immediately and after a delay to allow WineApp to set it
                 checkBackButton();
                 setTimeout(checkBackButton, 500);
+                setTimeout(syncMobileBackHref, 1200);
                 
                 // Also handle click event as fallback
                 backButton.addEventListener('click', (e) => {

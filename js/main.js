@@ -1065,6 +1065,46 @@ class WineListApp {
             wineName.textContent = wine.wine_name || 'Unknown Wine';
         }
 
+        // Populate mobile single-screen hero badges, price, and subline (if present on wine-details.html)
+        const mobilePriceEl = document.getElementById('mobileHeroPrice');
+        const mobileBadgesEl = document.getElementById('mobileHeroBadges');
+        const mobileSublineEl = document.getElementById('mobileHeroSubline');
+        if (mobilePriceEl || mobileBadgesEl || mobileSublineEl) {
+            const displayPrice = wine.wine_price || wine.wine_price_bottle || wine.wine_price_glass || '';
+            if (mobilePriceEl) {
+                mobilePriceEl.textContent = displayPrice ? `$${displayPrice}` : '';
+                mobilePriceEl.style.display = displayPrice ? '' : 'none';
+            }
+            const vintageYear = this.extractYear(wine.wine_vintage) || '';
+            const denomMatch = (wine.wine_vintage || '').match(/\b(DOCG|DOC|IGT)\b/i);
+            const denom = denomMatch ? denomMatch[1].toUpperCase() : (wine.wine_classification || wine.wine_appellation || '');
+            if (mobileBadgesEl) {
+                const fam = this.getWineFamily(wine.wine_type, wine.subcategory) || wine.wine_type || '';
+                const famNames = {
+                    'ROSSO': 'Red',
+                    'BIANCO': 'White',
+                    'ROSATO': 'Rosé',
+                    'ARANCIONE': 'Orange',
+                    'BOLLICINE': 'Sparkling',
+                    'NON ALCOLICO': 'Non-Alc'
+                };
+                const famLabel = famNames[fam] || fam;
+                const badges = [];
+                if (famLabel) badges.push(`<span class="wd-badge wd-badge--type" data-family="${this.escapeHtml(fam)}">${this.escapeHtml(famLabel)}</span>`);
+                if (denom) badges.push(`<span class="wd-badge wd-badge--denom">${this.escapeHtml(denom)}</span>`);
+                if (wine.organic === true) badges.push(`<span class="wd-badge wd-badge--organic">Organic</span>`);
+                mobileBadgesEl.innerHTML = badges.join('');
+            }
+            if (mobileSublineEl) {
+                const parts = [];
+                if (wine.wine_producer) parts.push(wine.wine_producer);
+                if (wine.region) parts.push(wine.region);
+                if (vintageYear) parts.push(vintageYear);
+                mobileSublineEl.textContent = parts.join(' · ');
+                mobileSublineEl.style.display = parts.length ? '' : 'none';
+            }
+        }
+
         // Mobile footer removed - price is shown in wine-meta section
 
         // Update page title
@@ -1144,22 +1184,22 @@ class WineListApp {
         const bodyDisplay = wine.body && String(wine.body).trim() ? this.formatTastingText(wine.body) : null;
         const formatDisplay = this.deriveFormat(wine);
         const metaItems = [
-            { label: 'Producer', value: wine.wine_producer || 'N/A', show: true },
-            { label: 'Region', value: wine.region || 'N/A', show: true },
-            { label: 'Grape', value: wine.varietals || 'N/A', show: !!wine.varietals },
-            { label: 'Vintage', value: vintage, show: true },
-            { label: 'Denomination', value: denomination, show: !!denomination },
-            { label: 'Formato', value: formatDisplay, show: !!formatDisplay },
-            { label: 'Body', value: bodyDisplay, show: !!bodyDisplay },
-            { label: 'Alcohol', value: alcohol, show: !!wine.alcohol },
-            { label: 'Price', value: priceValue, show: true }
+            { key: 'producer', label: 'Producer', value: wine.wine_producer || 'N/A', show: true },
+            { key: 'region', label: 'Region', value: wine.region || 'N/A', show: true },
+            { key: 'grape', label: 'Grape', value: wine.varietals || 'N/A', show: !!wine.varietals },
+            { key: 'vintage', label: 'Vintage', value: vintage, show: true },
+            { key: 'denomination', label: 'Denomination', value: denomination, show: !!denomination },
+            { key: 'formato', label: 'Formato', value: formatDisplay, show: !!formatDisplay },
+            { key: 'body', label: 'Body', value: bodyDisplay, show: !!bodyDisplay },
+            { key: 'alcohol', label: 'Alcohol', value: alcohol, show: !!wine.alcohol },
+            { key: 'price', label: 'Price', value: priceValue, show: true }
         ].filter(item => item.show);
 
         const metaContainer = document.getElementById('wineMeta');
         if (metaContainer) {
             if (metaItems.length > 0) {
                 metaContainer.innerHTML = metaItems.map(item => `
-                    <div class="meta-item">
+                    <div class="meta-item" data-meta-key="${item.key}">
                         <span class="meta-label">${item.label}</span>
                         <span class="meta-value">${item.value}</span>
                     </div>
@@ -1348,15 +1388,15 @@ class WineListApp {
         let panelHtml = '';
         if (hasStructuredNotes || body) {
             if (body) {
-                panelHtml += `<div class="tasting-category"><span class="tasting-label">Body</span><span class="tasting-value">${this.escapeHtml(body)}</span></div>`;
+                panelHtml += `<div class="tasting-category" data-tasting-key="body"><span class="tasting-label">Body</span><span class="tasting-value">${this.escapeHtml(body)}</span></div>`;
             }
             if (hasStructuredNotes) {
                 const visual = notes.visual ? this.formatTastingText(notes.visual) : '';
                 const olfactory = notes.olfactory ? this.formatTastingText(notes.olfactory) : '';
                 const gustatory = notes.gustatory ? this.formatTastingText(notes.gustatory) : '';
-                if (visual) panelHtml += `<div class="tasting-category"><span class="tasting-label">Visual</span><span class="tasting-value">${this.escapeHtml(visual)}</span></div>`;
-                if (olfactory) panelHtml += `<div class="tasting-category"><span class="tasting-label">Olfactory</span><span class="tasting-value">${this.escapeHtml(olfactory)}</span></div>`;
-                if (gustatory) panelHtml += `<div class="tasting-category"><span class="tasting-label">Gustatory</span><span class="tasting-value">${this.escapeHtml(gustatory)}</span></div>`;
+                if (visual) panelHtml += `<div class="tasting-category" data-tasting-key="visual"><span class="tasting-label">Visual</span><span class="tasting-value">${this.escapeHtml(visual)}</span></div>`;
+                if (olfactory) panelHtml += `<div class="tasting-category" data-tasting-key="olfactory"><span class="tasting-label">Olfactory</span><span class="tasting-value">${this.escapeHtml(olfactory)}</span></div>`;
+                if (gustatory) panelHtml += `<div class="tasting-category" data-tasting-key="gustatory"><span class="tasting-label">Gustatory</span><span class="tasting-value">${this.escapeHtml(gustatory)}</span></div>`;
             }
         } else {
             const wineDescription = wine.wine_description || 'A fine wine selection from our curated collection.';
